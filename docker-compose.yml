@@ -32,6 +32,7 @@ services:
       - ADMIN_JAVA_OPTS=${compreface_admin_java_options}
       - MAX_FILE_SIZE=${max_file_size}
       - MAX_REQUEST_SIZE=${max_request_size}B
+      - MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=health,metrics,prometheus  # Actuator aktivieren
     depends_on:
       - compreface-postgres-db
       - compreface-api
@@ -53,6 +54,15 @@ services:
       - MAX_REQUEST_SIZE=${max_request_size}B
       - CONNECTION_TIMEOUT=${connection_timeout:-10000}
       - READ_TIMEOUT=${read_timeout:-60000}
+      - MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=health,metrics,prometheus  # Actuator aktivieren
+    ports:
+      - "8080:8080"  # Sicherstellen, dass der Port korrekt gesetzt ist
+    healthcheck:
+      test: curl --fail http://localhost:8080/actuator/health || exit 1
+      interval: 10s
+      retries: 0
+      start_period: 0s
+      timeout: 1s
 
   compreface-fe:
     restart: always
